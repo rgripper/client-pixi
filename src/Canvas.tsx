@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as PIXI from "pixi.js";
+import { generatePlayArea } from 'SimHelper';
 
 export interface CanvasProps {
     width: number
@@ -8,18 +9,32 @@ export interface CanvasProps {
 
 export default class Canvas extends React.Component<CanvasProps> {
 
-    private readonly renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer;
+    private readonly app = new PIXI.Application();
 
     private canvasContainer: HTMLElement | null = null;
 
     constructor(props: CanvasProps) {
         super(props);
-        this.renderer = PIXI.autoDetectRenderer(props.width, props.height);
+
+        const app = this.app;
+
+        const area = generatePlayArea();
+
+        area.structures.forEach(struct => {
+          const graphics = new PIXI.Graphics();
+          graphics.lineStyle(2, 0xdd3300, undefined, 0);
+          graphics.drawRect(struct.position.x, struct.position.y, struct.size.width, struct.size.height);
+          app.stage.addChild(graphics);
+        });
+
+        // app.ticker.add(() => {
+
+        // });
 
     }
 
     componentDidMount() {
-        this.canvasContainer!.appendChild(this.renderer.view);
+        this.canvasContainer!.appendChild(this.app.view);
     }
 
     render() {
